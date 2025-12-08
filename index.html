@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gala de Premios - Votaciones</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header" aria-label="Controles de navegación">
+    <div class="header-left">
+      <img src="assets/logos/logo_premios.png" alt="Logo Gala" class="site-logo">
+    </div>
+    <div class="controls">
+      <div class="pager-controls" role="navigation" aria-label="Navegación categorías">
+        <button id="prev-cat" class="pager-btn" aria-label="Anterior categoría">◀</button>
+        <span id="category-indicator" class="category-indicator">1/30</span>
+        <button id="next-cat" class="pager-btn" aria-label="Siguiente categoría">▶</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pantalla inicial / landing -->
+  <div id="home-screen" class="home-screen">
+    <div class="home-card">
+      <img src="assets/logos/logo_premios.png" alt="Logo Gala" class="home-logo">
+      <h1 class="home-title">Gala de Premios</h1>
+      <div class="home-hero">
+        <!-- Se muestra el logo en el centro en la pantalla inicial -->
+        <img id="hero-img" src="assets/logos/logo_premios.png" alt="Logo Gala" />
+      </div>
+      <button id="start-voting" class="start-btn">Empezar a votar</button>
+    </div>
+  </div>
+
+  <main class="container">
+
+    <!-- Lista de categorías (orden dada por el usuario) -->
+
+    <section class="category" data-category="miembro-mas-antiguo" aria-labelledby="cat-miembro-mas-antiguo">
+      <h2 id="cat-miembro-mas-antiguo">MIEMBRO MAS ANTIGUO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <!-- Left column removed - thumbnails moved into clip slots -->
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1" data-nominee="ivan">
+              <div class="slot-title">Ivan</div>
+              <div class="slot-body"><img src="assets/photos/ivan_foto_nominado.JPEG" alt="Ivan" style="width:100%;height:100%;object-fit:cover;border-radius:6px"></div>
+              <div class="slot-actions">
+                <button class="vote-btn" data-nominee="ivan">Votar</button>
+                <button class="clips-btn" data-nominee="ivan" data-slot="1">Ver clip</button>
+                <div class="count" aria-live="polite">0</div>
+              </div>
+            </div>
+
+            <div class="clip-slot" data-slot="2" data-nominee="abraham">
+              <div class="slot-title">Abraham</div>
+              <div class="slot-body"><img src="assets/photos/abraham_foto_nominado.JPEG" alt="Abraham" style="width:100%;height:100%;object-fit:cover;border-radius:6px"></div>
+              <div class="slot-actions">
+                <button class="vote-btn" data-nominee="abraham">Votar</button>
+                <button class="clips-btn" data-nominee="abraham" data-slot="2">Ver clip</button>
+                <div class="count" aria-live="polite">0</div>
+              </div>
+            </div>
+
+            <div class="clip-slot" data-slot="3" data-nominee="luis">
+              <div class="slot-title">Luis</div>
+              <div class="slot-body"><img src="assets/photos/luis_foto_nominado.JPEG" alt="Luis" style="width:100%;height:100%;object-fit:cover;border-radius:6px"></div>
+              <div class="slot-actions">
+                <button class="vote-btn" data-nominee="luis">Votar</button>
+                <button class="clips-btn" data-nominee="luis" data-slot="3">Ver clip</button>
+                <div class="count" aria-live="polite">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="mayor-cantidad-mensajes" aria-labelledby="cat-mayor-cantidad-mensajes">
+      <h2 id="cat-mayor-cantidad-mensajes">MAYOR CANTIDAD DE MENSAJES ENVIADOS</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-mayor-cantidad-mensajes">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-mayor-cantidad-mensajes">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-mensajes" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-mensajes" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-mensajes" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="mayor-cantidad-insultos" aria-labelledby="cat-mayor-cantidad-insultos">
+      <h2 id="cat-mayor-cantidad-insultos">MAYOR CANTIDAD DE INSULTOS DICHOS</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-mayor-cantidad-insultos">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-mayor-cantidad-insultos">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-insultos" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-insultos" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-cantidad-insultos" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-mas-lloron" aria-labelledby="cat-el-mas-lloron">
+      <h2 id="cat-el-mas-lloron">EL MÁS LLORÓN</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-mas-lloron">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-mas-lloron">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-lloron" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-lloron" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-lloron" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-que-esta-pero-no-esta" aria-labelledby="cat-el-que-esta-pero-no-esta">
+      <h2 id="cat-el-que-esta-pero-no-esta">EL QUE ESTÁ PERO NO ESTÁ</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-que-esta-pero-no-esta">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-que-esta-pero-no-esta">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-esta-pero-no-esta" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-esta-pero-no-esta" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-esta-pero-no-esta" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-desaparecido" aria-labelledby="cat-el-desaparecido">
+      <h2 id="cat-el-desaparecido">EL DESAPARECIDO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-desaparecido">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-desaparecido">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-desaparecido" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-desaparecido" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-desaparecido" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-del-micro-prehistorico" aria-labelledby="cat-el-del-micro-prehistorico">
+      <h2 id="cat-el-del-micro-prehistorico">EL DEL MICRO PREHISTORICO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-del-micro-prehistorico">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-del-micro-prehistorico">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-micro-prehistorico" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-micro-prehistorico" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-micro-prehistorico" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-tieso" aria-labelledby="cat-el-tieso">
+      <h2 id="cat-el-tieso">EL TIESO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-tieso">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-tieso">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tieso" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tieso" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tieso" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-del-spotify" aria-labelledby="cat-el-del-spotify">
+      <h2 id="cat-el-del-spotify">EL DEL SPOTIFY</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-del-spotify">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-del-spotify">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-spotify" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-spotify" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-del-spotify" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-anticampanas" aria-labelledby="cat-el-anticampanas">
+      <h2 id="cat-el-anticampanas">EL ANTICAMPAÑAS</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-anticampanas">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-anticampanas">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-anticampanas" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-el-anticampanas" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-anticampanas" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-mas-cojo" aria-labelledby="cat-el-mas-cojo">
+      <h2 id="cat-el-mas-cojo">EL MÁS COJO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-mas-cojo">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-mas-cojo">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-cojo" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-cojo" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-cojo" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-tryhard-que-nadie-pidio" aria-labelledby="cat-el-tryhard-que-nadie-pidio">
+      <h2 id="cat-el-tryhard-que-nadie-pidio">EL TRYHARD QUE NADIE PIDIÓ</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-tryhard-que-nadie-pidio">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-tryhard-que-nadie-pidio">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tryhard-que-nadie-pidio" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tryhard-que-nadie-pidio" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-tryhard-que-nadie-pidio" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="ragebaiter-profesional" aria-labelledby="cat-ragebaiter-profesional">
+      <h2 id="cat-ragebaiter-profesional">RAGEBAITER PROFESIONAL</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-ragebaiter-profesional">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-ragebaiter-profesional">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-ragebaiter-profesional" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-ragebaiter-profesional" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-ragebaiter-profesional" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-mas-maricon" aria-labelledby="cat-el-mas-maricon">
+      <h2 id="cat-el-mas-maricon">EL MÁS MARICÓN</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-mas-maricon">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-mas-maricon">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-maricon" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-maricon" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-mas-maricon" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-que-siempre-pide-roles" aria-labelledby="cat-el-que-siempre-pide-roles">
+      <h2 id="cat-el-que-siempre-pide-roles">EL QUE SIEMPRE PIDE ROLES</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-que-siempre-pide-roles">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-que-siempre-pide-roles">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-siempre-pide-roles" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-siempre-pide-roles" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-que-siempre-pide-roles" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="el-dormilon-del-ano" aria-labelledby="cat-el-dormilon-del-ano">
+      <h2 id="cat-el-dormilon-del-ano">EL DORMILÓN DEL AÑO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-el-dormilon-del-ano">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-el-dormilon-del-ano">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-dormilon-del-ano" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-dormilon-del-ano" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-el-dormilon-del-ano" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="mascota-del-ano" aria-labelledby="cat-mascota-del-ano">
+      <h2 id="cat-mascota-del-ano">MASCOTA DEL AÑO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-mascota-del-ano">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-mascota-del-ano">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mascota-del-ano" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mascota-del-ano" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mascota-del-ano" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="mejor-susto" aria-labelledby="cat-mejor-susto">
+      <h2 id="cat-mejor-susto">MEJOR SUSTO</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-mejor-susto">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-mejor-susto">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mejor-susto" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mejor-susto" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mejor-susto" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="mayor-fail" aria-labelledby="cat-mayor-fail">
+      <h2 id="cat-mayor-fail">MAYOR FAIL</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-mayor-fail">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-mayor-fail">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-fail" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-fail" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-mayor-fail" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="category" data-category="clip-del-discord" aria-labelledby="cat-clip-del-discord">
+      <h2 id="cat-clip-del-discord">CLIP DEL DISCORD</h2>
+      <p class="category-desc">Nominado provisional para referencia.</p>
+      <div class="nominees">
+        <div class="category-main">
+          <div class="provisional-card">
+            <div class="name">Provisional</div>
+            <div class="category-desc small">Nominado temporal — reemplazar luego.</div>
+            <div class="actions">
+              <button class="vote-btn" data-nominee="prov-clip-del-discord">Votar (provisional)</button>
+              <button class="clips-btn" data-nominee="prov-clip-del-discord">Ver clips</button>
+              <div class="count" aria-live="polite">0</div>
+            </div>
+          </div>
+          <div class="clip-slots">
+            <div class="clip-slot" data-slot="1"><div class="slot-title">Clip 1</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-clip-del-discord" data-slot="1">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="2"><div class="slot-title">Clip 2</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-clip-del-discord" data-slot="2">Ver clip</button></div></div>
+            <div class="clip-slot" data-slot="3"><div class="slot-title">Clip 3</div><div class="slot-body">Vista previa</div><div class="slot-actions"><button class="clips-btn" data-nominee="prov-clip-del-discord" data-slot="3">Ver clip</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Hecho con ❤️ — Apertura local del archivo <code>index.html</code> suficiente para probar. Para producción se necesita backend.</p>
+    <button id="reset-local" class="reset">Restablecer votos (local)</button>
+  </footer>
+
+  <!-- Modal para ver clips -->
+  <div id="clip-modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-overlay" data-close="true"></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close" aria-label="Cerrar">✕</button>
+      <h3 class="modal-title">Clips</h3>
+      <div class="modal-body">
+        <!-- Aquí se insertarán los clips dinámicamente -->
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
