@@ -449,6 +449,14 @@ body.home-active .home-logo{display:none}
   z-index:101;
 }
 
+.footer-buttons{
+  margin-top:1rem;
+  display:flex;
+  gap:0.8rem;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
 /* Modal */
 .modal{display:none;position:fixed;inset:0;z-index:10002}
 .modal[aria-hidden="false"]{display:block}

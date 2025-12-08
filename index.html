@@ -785,7 +785,12 @@
 
   <footer class="site-footer">
     <p>Hecho con ❤️ — Apertura local del archivo <code>index.html</code> suficiente para probar. Para producción se necesita backend.</p>
-    <button id="reset-local" class="reset">Restablecer votos (local)</button>
+    <div class="footer-buttons">
+      <button id="reset-local" class="reset">Restablecer votos</button>
+      <button id="export-votes" class="reset">Descargar votos</button>
+      <button id="import-votes" class="reset">Cargar votos</button>
+      <input type="file" id="votes-file" accept=".json" style="display:none;">
+    </div>
   </footer>
 
   <!-- Pantalla de resultados -->

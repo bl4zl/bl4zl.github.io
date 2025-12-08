@@ -548,6 +548,75 @@
       });
     }
     
+    // Botón para exportar votos
+    const exportBtn = document.getElementById('export-votes');
+    if(exportBtn){
+      exportBtn.addEventListener('click', () => {
+        // Recopilar todos los votos
+        const votes = {};
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('gala_votes::'));
+        keys.forEach(k => {
+          votes[k] = localStorage.getItem(k);
+        });
+        
+        // Crear archivo JSON
+        const dataStr = JSON.stringify(votes, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `votos_gala_${new Date().getTime()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        alert('Votos descargados correctamente');
+      });
+    }
+    
+    // Botón para importar votos
+    const importBtn = document.getElementById('import-votes');
+    const fileInput = document.getElementById('votes-file');
+    if(importBtn && fileInput){
+      importBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+      
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const votes = JSON.parse(event.target.result);
+            
+            // Confirmar antes de importar
+            if(!confirm('¿Deseas cargar los votos desde el archivo? Se sobrescribirán los votos actuales.')) return;
+            
+            // Limpiar votos actuales
+            const keys = Object.keys(localStorage).filter(k => k.startsWith('gala_votes::'));
+            keys.forEach(k => localStorage.removeItem(k));
+            
+            // Importar nuevos votos
+            Object.keys(votes).forEach(k => {
+              localStorage.setItem(k, votes[k]);
+            });
+            
+            // Actualizar UI
+            document.querySelectorAll(CATEGORY_SELECTOR).forEach(c => updateCountsForCategory(c));
+            alert('Votos cargados correctamente');
+            
+            // Limpiar input
+            fileInput.value = '';
+          } catch(err) {
+            alert('Error al cargar el archivo: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+    
     // Botón para resetear desde la pantalla de resultados
     const resetVotesBtn = document.getElementById('reset-votes');
     if(resetVotesBtn){
