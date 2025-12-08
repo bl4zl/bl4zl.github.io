@@ -153,10 +153,114 @@
     if(!categoriesList || categoriesList.length === 0) return;
     if(currentCard){
       const idx = categoriesList.indexOf(currentCard);
+      // Verificar si es la última categoría
+      if(idx + 1 >= categoriesList.length){
+        // Mostrar pantalla de resultados después de un pequeño delay
+        setTimeout(showResultsScreen, 1000);
+        return;
+      }
       scrollToIndex(idx + 1);
     } else {
       scrollToIndex(currentIndex + 1);
     }
+  }
+
+  // Función para obtener los resultados globales
+  function getGlobalRankings(){
+    const rankings = {};
+    
+    // Iterar sobre todas las claves del localStorage
+    for(let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      if(key.startsWith('gala_votes::')){
+        // Extraer el nombre del nominado de la clave
+        const parts = key.split('::');
+        if(parts.length >= 3){
+          const nominee = parts[2];
+          const votes = parseInt(localStorage.getItem(key) || '0', 10);
+          if(!rankings[nominee]){
+            rankings[nominee] = 0;
+          }
+          rankings[nominee] += votes;
+        }
+      }
+    }
+    
+    // Convertir a array y ordenar por votos descendente
+    const rankingArray = Object.entries(rankings)
+      .map(([name, votes]) => ({ name, votes }))
+      .sort((a, b) => b.votes - a.votes);
+    
+    return rankingArray;
+  }
+
+  // Función para mostrar la pantalla de resultados
+  function showResultsScreen(){
+    const resultsScreen = document.getElementById('results-screen');
+    if(!resultsScreen) return;
+    
+    const container = document.querySelector('.container');
+    if(container) container.style.display = 'none';
+    
+    const rankings = getGlobalRankings();
+    const rankingContainer = resultsScreen.querySelector('.results-ranking');
+    
+    // Limpiar contenido anterior
+    rankingContainer.innerHTML = '';
+    
+    // Crear elemento para cada nominado
+    if(rankings.length === 0){
+      rankingContainer.innerHTML = '<p>No hay votos registrados.</p>';
+    } else {
+      rankings.forEach((item, index) => {
+        const position = index + 1;
+        let medal = '';
+        if(position === 1) medal = '🥇';
+        else if(position === 2) medal = '🥈';
+        else if(position === 3) medal = '🥉';
+        
+        const rankItem = document.createElement('div');
+        rankItem.className = 'rank-item';
+        rankItem.style.animationDelay = (index * 100) + 'ms';
+        rankItem.innerHTML = `
+          <div class="rank-medal">${medal}</div>
+          <div class="rank-name">${item.name}</div>
+          <div class="rank-votes">${item.votes} votos</div>
+        `;
+        rankingContainer.appendChild(rankItem);
+      });
+    }
+    
+    // Mostrar la pantalla con animación
+    resultsScreen.classList.remove('hidden');
+    resultsScreen.classList.add('show');
+  }
+
+  // Función para resetear la votación
+  function resetVotingFromResults(){
+    if(!confirm('¿Deseas reiniciar la votación? Se perderán todos los votos.')) return;
+    
+    // Limpiar localStorage
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('gala_votes::') || k.startsWith('gala_voted::'));
+    keys.forEach(k => localStorage.removeItem(k));
+    
+    // Ocultar pantalla de resultados
+    const resultsScreen = document.getElementById('results-screen');
+    if(resultsScreen){
+      resultsScreen.classList.remove('show');
+      resultsScreen.classList.add('hidden');
+    }
+    
+    // Mostrar contenedor de categorías
+    const container = document.querySelector('.container');
+    if(container) container.style.display = '';
+    
+    // Volver a la primera categoría
+    currentIndex = 0;
+    scrollToIndex(0);
+    
+    // Actualizar contadores
+    categoriesList.forEach(c => updateCountsForCategory(c));
   }
 
   function bindCategory(card){
@@ -235,9 +339,161 @@
     });
   }
 
+  // Sistema de tela de araña interactiva
+  function initParticleSystem(){
+    const canvas = document.getElementById('particles-canvas');
+    if(!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+    let isAnimating = false;
+    
+    // Configurar canvas con dimensiones correctas
+    function setupCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
+    
+    // Colores más suaves y complementarios al fondo ciberpunk
+    const colors = [
+      'rgba(168, 85, 247, 0.8)',    // Púrpura
+      'rgba(0, 217, 255, 0.8)',     // Cian luminoso
+      'rgba(124, 58, 237, 0.7)',    // Púrpura más oscuro
+      'rgba(139, 92, 246, 0.7)',    // Púrpura claro
+      'rgba(6, 182, 212, 0.7)',     // Cian más oscuro
+      'rgba(168, 85, 247, 0.75)',   // Púrpura alternativo
+      'rgba(0, 217, 255, 0.75)'     // Cian alternativo
+    ];
+    
+    class Particle {
+      constructor(){
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
+        this.radius = Math.random() * 2.5 + 1;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.originalRadius = this.radius;
+      }
+      
+      update(mx, my){
+        // Movimiento suave
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Oscilación suave hacia la base
+        this.baseX += (Math.random() - 0.5) * 1.2;
+        this.baseY += (Math.random() - 0.5) * 1.2;
+        this.x += (this.baseX - this.x) * 0.08;
+        this.y += (this.baseY - this.y) * 0.08;
+        
+        // Rebotar en bordes
+        if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        
+        this.x = Math.max(0, Math.min(canvas.width, this.x));
+        this.y = Math.max(0, Math.min(canvas.height, this.y));
+        
+        // Reacción al ratón
+        const dx = mx - this.x;
+        const dy = my - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if(dist < 150){
+          this.radius = this.originalRadius + (1 - dist / 150) * 5;
+        } else {
+          this.radius = this.originalRadius;
+        }
+      }
+      
+      draw(){
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    // Dibujar líneas entre partículas
+    function drawNetwork(){
+      for(let i = 0; i < particles.length; i++){
+        for(let j = i + 1; j < particles.length; j++){
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if(dist < 120){
+            ctx.strokeStyle = `rgba(168, 85, 247, ${0.3 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      // Conectar al ratón
+      for(let i = 0; i < particles.length; i++){
+        const dx = mouseX - particles[i].x;
+        const dy = mouseY - particles[i].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if(dist < 150 && dist > 0){
+          ctx.strokeStyle = `rgba(0, 217, 255, ${0.6 * (1 - dist / 150)})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(mouseX, mouseY);
+          ctx.lineTo(particles[i].x, particles[i].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    function animate(){
+      // Limpiar canvas
+      ctx.fillStyle = 'rgba(10, 10, 21, 0)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Actualizar y dibujar
+      particles.forEach(p => p.update(mouseX, mouseY));
+      drawNetwork();
+      particles.forEach(p => p.draw());
+      
+      // Mantener cantidad de partículas
+      while(particles.length < 120) particles.push(new Particle());
+      while(particles.length > 120) particles.pop();
+      
+      requestAnimationFrame(animate);
+    }
+    
+    // Tracking del ratón
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    
+    // Inicializar partículas después de un delay
+    setTimeout(() => {
+      for(let i = 0; i < 120; i++){
+        particles.push(new Particle());
+      }
+      animate();
+    }, 100);
+  }
+
   // Inicialización
   function init(){
     renderPlaceholders();
+    
     // Envolver dinámicamente el h2 y .category-desc en una sola "cajita" visual
     // para evitar tocar manualmente cada sección en el HTML.
     function wrapCategoryHeaders(){
@@ -290,6 +546,12 @@
         document.querySelectorAll(CATEGORY_SELECTOR).forEach(c => updateCountsForCategory(c));
         alert('Votos locales restablecidos.');
       });
+    }
+    
+    // Botón para resetear desde la pantalla de resultados
+    const resetVotesBtn = document.getElementById('reset-votes');
+    if(resetVotesBtn){
+      resetVotesBtn.addEventListener('click', resetVotingFromResults);
     }
   }
 
@@ -344,6 +606,19 @@
     }
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attachStart); else attachStart();
+  // Inicializar partículas apenas el DOM esté listo
+  function initParticlesEarly(){
+    setTimeout(() => {
+      initParticleSystem();
+    }, 50);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initParticlesEarly);
+    document.addEventListener('DOMContentLoaded', attachStart);
+  } else {
+    initParticlesEarly();
+    attachStart();
+  }
 
 })();

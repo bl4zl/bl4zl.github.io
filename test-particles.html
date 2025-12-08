@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Particles</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0a0a15 0%, #1a0a2e 50%, #0a0a15 100%);
+      overflow: hidden;
+    }
+    #particles-canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 10;
+      color: white;
+      padding: 20px;
+      font-family: Arial;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles-canvas"></canvas>
+  <div class="content">
+    <h1>Prueba de Partículas</h1>
+    <p>Mueve el ratón para ver las partículas reaccionar</p>
+  </div>
+
+  <script>
+    // Sistema de tela de araña interactiva - VERSIÓN DE PRUEBA
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Configurar canvas
+    function setupCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      console.log('Canvas configurado:', canvas.width, 'x', canvas.height);
+    }
+
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
+
+    // Colores
+    const colors = [
+      'rgba(168, 85, 247, 0.6)',
+      'rgba(0, 217, 255, 0.6)',
+      'rgba(124, 58, 237, 0.5)',
+      'rgba(139, 92, 246, 0.5)',
+      'rgba(6, 182, 212, 0.5)'
+    ];
+
+    class Particle {
+      constructor(){
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.radius = Math.random() * 1.5 + 0.5;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.originalRadius = this.radius;
+      }
+
+      update(mx, my){
+        this.x += this.vx;
+        this.y += this.vy;
+
+        this.baseX += (Math.random() - 0.5) * 0.3;
+        this.baseY += (Math.random() - 0.5) * 0.3;
+        this.x += (this.baseX - this.x) * 0.03;
+        this.y += (this.baseY - this.y) * 0.03;
+
+        if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        this.x = Math.max(0, Math.min(canvas.width, this.x));
+        this.y = Math.max(0, Math.min(canvas.height, this.y));
+
+        const dx = mx - this.x;
+        const dy = my - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if(dist < 150){
+          this.radius = this.originalRadius + (1 - dist / 150) * 3;
+        } else {
+          this.radius = this.originalRadius;
+        }
+      }
+
+      draw(){
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawNetwork(){
+      for(let i = 0; i < particles.length; i++){
+        for(let j = i + 1; j < particles.length; j++){
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if(dist < 120){
+            ctx.strokeStyle = `rgba(168, 85, 247, ${0.2 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      for(let i = 0; i < particles.length; i++){
+        const dx = mouseX - particles[i].x;
+        const dy = mouseY - particles[i].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if(dist < 150 && dist > 0){
+          ctx.strokeStyle = `rgba(0, 217, 255, ${0.4 * (1 - dist / 150)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(mouseX, mouseY);
+          ctx.lineTo(particles[i].x, particles[i].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    function animate(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => p.update(mouseX, mouseY));
+      drawNetwork();
+      particles.forEach(p => p.draw());
+
+      while(particles.length < 35) particles.push(new Particle());
+      while(particles.length > 35) particles.pop();
+
+      requestAnimationFrame(animate);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Iniciar
+    for(let i = 0; i < 35; i++){
+      particles.push(new Particle());
+    }
+    console.log('Iniciando animación con', particles.length, 'partículas');
+    animate();
+  </script>
+</body>
+</html>
