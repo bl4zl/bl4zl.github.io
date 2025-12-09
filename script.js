@@ -12,11 +12,17 @@
   let categoriesList = [];
   let currentIndex = 0;
   let scrollDebounceTimer = null;
+  let isScrolling = false; // flag para evitar múltiples scrolls simultáneos
 
   function scrollToIndex(i){
     if(!categoriesList || categoriesList.length === 0) return;
+    if(isScrolling) return; // ignorar si ya está scrolling
+    
     const idx = Math.max(0, Math.min(i, categoriesList.length - 1));
     const containerEl = document.querySelector('.container');
+    
+    isScrolling = true; // marcar como scrolling
+    
     if(containerEl){
       // calcular desplazamiento horizontal relativo al contenedor para evitar cualquier scroll vertical
       const targetRect = categoriesList[idx].getBoundingClientRect();
@@ -29,12 +35,26 @@
     }
     currentIndex = idx;
     updateIndicator();
+    
+    // permitir nuevos scrolls después de 600ms (tiempo de animación + buffer)
+    setTimeout(() => { isScrolling = false; }, 600);
   }
 
   function updateIndicator(){
     const el = document.getElementById('category-indicator');
     if(!el) return;
     el.textContent = (categoriesList.length ? (currentIndex + 1) + '/' + categoriesList.length : '0/0');
+    
+    // Actualizar clase .active para transiciones suaves
+    if(categoriesList && categoriesList.length > 0){
+      categoriesList.forEach((cat, idx) => {
+        if(idx === currentIndex){
+          cat.classList.add('active');
+        } else {
+          cat.classList.remove('active');
+        }
+      });
+    }
   }
 
   function detectCurrentIndex(){
@@ -60,6 +80,58 @@
   function setCount(category, nominee, n){ localStorage.setItem(storageKeyVotes(category, nominee), String(n)); }
   function markVoted(category){ localStorage.setItem(storageKeyVoted(category), '1'); }
   function hasVoted(category){ return !!localStorage.getItem(storageKeyVoted(category)); }
+
+  // Backend API configuration
+  const BACKEND_URL = 'https://gala-backend-od1w8tw0u-ivans-projects-51d92067.vercel.app';
+
+  // Backend sync functions
+  async function saveVoteToFirebase(category, nominee, count){
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category: category,
+          nominee: nominee,
+          count: count
+        })
+      });
+      
+      if(response.ok) {
+        console.log('Vote saved to backend:', category, nominee, count);
+      }
+    } catch(err) {
+      console.log('Backend save error (non-critical):', err);
+    }
+  }
+
+  async function loadVotesFromFirebase(){
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/votes`);
+      if(response.ok) {
+        const data = await response.json();
+        
+        // Cargar votos del backend al localStorage
+        Object.keys(data).forEach(category => {
+          Object.keys(data[category]).forEach(nominee => {
+            const backendCount = data[category][nominee] || 0;
+            const localCount = getCount(category, nominee);
+            // Usar el máximo entre local y backend
+            if(backendCount > localCount){
+              setCount(category, nominee, backendCount);
+            }
+          });
+        });
+        
+        console.log('Votes loaded from backend');
+      }
+    } catch(err) {
+      console.log('Backend load error (non-critical):', err);
+    }
+  }
+
 
   // Render provisional: 3 nominados por categoría si no hay contenidos dinámicos
   function renderPlaceholders(){
@@ -310,7 +382,9 @@
         if(!name) return; // no podemos votar sin identificado el nominado
         const cat = card.dataset.category;
         const current = getCount(cat, name);
-        setCount(cat, name, current + 1);
+        const newCount = current + 1;
+        setCount(cat, name, newCount);
+        saveVoteToFirebase(cat, name, newCount); // Guardar en Firebase
         markVoted(cat);
         updateCountsForCategory(card);
         setTimeout(() => goToNextCategory(card), 600);
@@ -376,8 +450,8 @@
         this.y = Math.random() * canvas.height;
         this.baseX = this.x;
         this.baseY = this.y;
-        this.vx = (Math.random() - 0.5) * 1.5;
-        this.vy = (Math.random() - 0.5) * 1.5;
+        this.vx = (Math.random() - 0.5) * 2.5;
+        this.vy = (Math.random() - 0.5) * 2.5;
         this.radius = Math.random() * 2.5 + 1;
         this.color = colors[Math.floor(Math.random() * colors.length)];
         this.originalRadius = this.radius;
@@ -389,12 +463,12 @@
         this.y += this.vy;
         
         // Oscilación suave hacia la base
-        this.baseX += (Math.random() - 0.5) * 1.2;
-        this.baseY += (Math.random() - 0.5) * 1.2;
-        this.x += (this.baseX - this.x) * 0.08;
-        this.y += (this.baseY - this.y) * 0.08;
+        this.baseX += (Math.random() - 0.5) * 1.8;
+        this.baseY += (Math.random() - 0.5) * 1.8;
+        this.x += (this.baseX - this.x) * 0.06;
+        this.y += (this.baseY - this.y) * 0.06;
         
-        // Rebotar en bordes
+        // Rebotar en bordes con mayor movimiento
         if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
         if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
         
@@ -466,11 +540,35 @@
       // Actualizar y dibujar
       particles.forEach(p => p.update(mouseX, mouseY));
       drawNetwork();
-      particles.forEach(p => p.draw());
+      
+      // Dibujar partículas, pero omitir solo cuando están sobre imágenes de nominados durante voting
+      particles.forEach(p => {
+        let isOverImage = false;
+        
+        // Verificar si estamos en modo voting (home-screen no visible)
+        const homeScreen = document.getElementById('home-screen');
+        const isVoting = homeScreen && homeScreen.style.display === 'none';
+        
+        if(isVoting){
+          // En voting, ocultar partículas sobre las imágenes
+          const clipSlots = document.querySelectorAll('.clip-slot .slot-body');
+          clipSlots.forEach(slot => {
+            const rect = slot.getBoundingClientRect();
+            if(p.x >= rect.left && p.x <= rect.right && 
+               p.y >= rect.top && p.y <= rect.bottom){
+              isOverImage = true;
+            }
+          });
+        }
+        
+        if(!isOverImage){
+          p.draw();
+        }
+      });
       
       // Mantener cantidad de partículas
-      while(particles.length < 120) particles.push(new Particle());
-      while(particles.length > 120) particles.pop();
+      while(particles.length < 180) particles.push(new Particle());
+      while(particles.length > 180) particles.pop();
       
       requestAnimationFrame(animate);
     }
@@ -490,41 +588,192 @@
     }, 100);
   }
 
+  // Sistema de partículas dedicado para la pantalla de inicio
+  function initHomeParticles(){
+    const homeScreen = document.getElementById('home-screen');
+    if(!homeScreen) return;
+    
+    // Crear canvas específico para partículas de home
+    let homeCanvas = document.getElementById('home-particles-canvas');
+    if(!homeCanvas){
+      homeCanvas = document.createElement('canvas');
+      homeCanvas.id = 'home-particles-canvas';
+      homeCanvas.style.position = 'fixed';
+      homeCanvas.style.top = '0';
+      homeCanvas.style.left = '0';
+      homeCanvas.style.width = '100%';
+      homeCanvas.style.height = '100%';
+      homeCanvas.style.pointerEvents = 'none';
+      homeCanvas.style.zIndex = '10000';
+      document.body.insertBefore(homeCanvas, document.body.firstChild);
+    }
+    
+    const ctx = homeCanvas.getContext('2d');
+    let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+    
+    function setupCanvas(){
+      homeCanvas.width = window.innerWidth;
+      homeCanvas.height = window.innerHeight;
+    }
+    
+    setupCanvas();
+    window.addEventListener('resize', setupCanvas);
+    
+    const colors = [
+      'rgba(168, 85, 247, 0.8)',
+      'rgba(0, 217, 255, 0.8)',
+      'rgba(124, 58, 237, 0.7)',
+      'rgba(139, 92, 246, 0.7)',
+      'rgba(6, 182, 212, 0.7)',
+      'rgba(168, 85, 247, 0.75)',
+      'rgba(0, 217, 255, 0.75)'
+    ];
+    
+    class HomeParticle {
+      constructor(){
+        this.x = Math.random() * homeCanvas.width;
+        this.y = Math.random() * homeCanvas.height;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.radius = Math.random() * 2.5 + 1;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.originalRadius = this.radius;
+      }
+      
+      update(mx, my){
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        this.baseX += (Math.random() - 0.5) * 1.5;
+        this.baseY += (Math.random() - 0.5) * 1.5;
+        this.x += (this.baseX - this.x) * 0.07;
+        this.y += (this.baseY - this.y) * 0.07;
+        
+        if(this.x < 0 || this.x > homeCanvas.width) this.vx *= -1;
+        if(this.y < 0 || this.y > homeCanvas.height) this.vy *= -1;
+        
+        this.x = Math.max(0, Math.min(homeCanvas.width, this.x));
+        this.y = Math.max(0, Math.min(homeCanvas.height, this.y));
+        
+        const dx = mx - this.x;
+        const dy = my - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if(dist < 150){
+          this.radius = this.originalRadius + (1 - dist / 150) * 5;
+        } else {
+          this.radius = this.originalRadius;
+        }
+      }
+      
+      draw(){
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function drawNetwork(){
+      for(let i = 0; i < particles.length; i++){
+        for(let j = i + 1; j < particles.length; j++){
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if(dist < 120){
+            ctx.strokeStyle = `rgba(168, 85, 247, ${0.3 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      for(let i = 0; i < particles.length; i++){
+        const dx = mouseX - particles[i].x;
+        const dy = mouseY - particles[i].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if(dist < 150 && dist > 0){
+          ctx.strokeStyle = `rgba(0, 217, 255, ${0.6 * (1 - dist / 150)})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(mouseX, mouseY);
+          ctx.lineTo(particles[i].x, particles[i].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    function animate(){
+      ctx.clearRect(0, 0, homeCanvas.width, homeCanvas.height);
+      
+      particles.forEach(p => p.update(mouseX, mouseY));
+      drawNetwork();
+      particles.forEach(p => p.draw());
+      
+      while(particles.length < 150) particles.push(new HomeParticle());
+      while(particles.length > 150) particles.pop();
+      
+      requestAnimationFrame(animate);
+    }
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    
+    for(let i = 0; i < 100; i++){
+      particles.push(new HomeParticle());
+    }
+    animate();
+  }
+
+
   // Inicialización
   function init(){
     renderPlaceholders();
     
-    // Envolver dinámicamente el h2 y .category-desc en una sola "cajita" visual
-    // para evitar tocar manualmente cada sección en el HTML.
-    function wrapCategoryHeaders(){
-      document.querySelectorAll('.category').forEach(cat => {
-        if(cat.querySelector('.category-header')) return; // ya envuelto
-        const h2 = cat.querySelector('h2');
-        const desc = cat.querySelector('.category-desc');
-        if(h2 && desc){
-          const wrapper = document.createElement('div');
-          wrapper.className = 'category-header';
-          h2.parentNode.insertBefore(wrapper, h2);
-          wrapper.appendChild(h2);
-          wrapper.appendChild(desc);
-        }
+    // Cargar votos de Firebase primero
+    loadVotesFromFirebase().then(() => {
+      // Envolver dinámicamente el h2 y .category-desc en una sola "cajita" visual
+      // para evitar tocar manualmente cada sección en el HTML.
+      function wrapCategoryHeaders(){
+        document.querySelectorAll('.category').forEach(cat => {
+          if(cat.querySelector('.category-header')) return; // ya envuelto
+          const h2 = cat.querySelector('h2');
+          const desc = cat.querySelector('.category-desc');
+          if(h2 && desc){
+            const wrapper = document.createElement('div');
+            wrapper.className = 'category-header';
+            h2.parentNode.insertBefore(wrapper, h2);
+            wrapper.appendChild(h2);
+            wrapper.appendChild(desc);
+          }
+        });
+      }
+      wrapCategoryHeaders();
+
+      // construir lista de categorías y enlazar navegación
+      categoriesList = Array.from(document.querySelectorAll(CATEGORY_SELECTOR));
+      // enlazar handlers y actualizar contadores
+      categoriesList.forEach(card => {
+        bindCategory(card);
+        updateCountsForCategory(card);
       });
-    }
-    wrapCategoryHeaders();
+      bindModalClose();
 
-    // construir lista de categorías y enlazar navegación
-    categoriesList = Array.from(document.querySelectorAll(CATEGORY_SELECTOR));
-    // enlazar handlers y actualizar contadores
-    categoriesList.forEach(card => {
-      bindCategory(card);
-      updateCountsForCategory(card);
-    });
-    bindModalClose();
-
-    // indicador inicial y detección
-    updateIndicator();
-    // detectar índice visible tras un pequeño retardo (por si el layout varía)
-    setTimeout(detectCurrentIndex, 50);
+      // indicador inicial y detección
+      updateIndicator();
+      // detectar índice visible tras un pequeño retardo (por si el layout varía)
+      setTimeout(detectCurrentIndex, 50);
 
     // botones prev/next
     const prevBtn = document.getElementById('prev-cat');
@@ -622,11 +871,14 @@
     if(resetVotesBtn){
       resetVotesBtn.addEventListener('click', resetVotingFromResults);
     }
+    });
   }
 
   // Arranque condicionado: esperamos a que el usuario pulse "Empezar a votar" en la pantalla inicial.
   function startApp(){
     const home = document.getElementById('home-screen');
+    const homeCanvas = document.getElementById('home-particles-canvas');
+    
     if(home){
       // activar animación de cierre y esperar a que termine antes de inicializar
       home.classList.add('closing');
@@ -635,6 +887,8 @@
         if(ev.target !== home) return;
         home.removeEventListener('transitionend', onTransitionEnd);
         home.style.display = 'none';
+        // Ocultar canvas de partículas de home
+        if(homeCanvas) homeCanvas.style.display = 'none';
         // marcar que estamos en modo votación para estilos (logo a la derecha, más grande)
         try{ document.body.classList.remove('home-active'); document.body.classList.add('voting'); } catch(e){}
         init();
@@ -647,6 +901,8 @@
         if(getComputedStyle(home).display !== 'none'){
           home.removeEventListener('transitionend', onTransitionEnd);
           home.style.display = 'none';
+          // Ocultar canvas de partículas de home
+          if(homeCanvas) homeCanvas.style.display = 'none';
           home.classList.remove('closing');
           try{ document.body.classList.remove('home-active'); document.body.classList.add('voting'); } catch(e){}
           init();
@@ -655,6 +911,7 @@
       }, 800);
     } else {
       // no hay pantalla inicial -> arrancar de inmediato
+      if(homeCanvas) homeCanvas.style.display = 'none';
       try{ document.body.classList.remove('home-active'); document.body.classList.add('voting'); } catch(e){}
       init();
       scrollToIndex(0);
@@ -679,6 +936,7 @@
   function initParticlesEarly(){
     setTimeout(() => {
       initParticleSystem();
+      initHomeParticles();
     }, 50);
   }
 
