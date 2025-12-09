@@ -113,19 +113,19 @@
       if(response.ok) {
         const data = await response.json();
         
+        // Limpiar localStorage primero para cargar votos frescos del backend
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('gala_votes::'));
+        keys.forEach(k => localStorage.removeItem(k));
+        
         // Cargar votos del backend al localStorage
         Object.keys(data).forEach(category => {
           Object.keys(data[category]).forEach(nominee => {
             const backendCount = data[category][nominee] || 0;
-            const localCount = getCount(category, nominee);
-            // Usar el máximo entre local y backend
-            if(backendCount > localCount){
-              setCount(category, nominee, backendCount);
-            }
+            setCount(category, nominee, backendCount);
           });
         });
         
-        console.log('Votes loaded from backend');
+        console.log('Votes loaded from backend:', data);
       }
     } catch(err) {
       console.log('Backend load error (non-critical):', err);
