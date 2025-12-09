@@ -82,7 +82,7 @@
   function hasVoted(category){ return !!localStorage.getItem(storageKeyVoted(category)); }
 
   // Backend API configuration
-  const BACKEND_URL = 'https://gala-backend-od1w8tw0u-ivans-projects-51d92067.vercel.app';
+  const BACKEND_URL = 'https://zenaida-uncoloured-lucienne.ngrok-free.dev';
 
   // Backend sync functions
   async function saveVoteToFirebase(category, nominee, count){
